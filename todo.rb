@@ -3,7 +3,7 @@
 
 require 'gitlab'
 
-# [TODO: check if gitlab host or token if set]
+
 $new_todo = []
 $old_todo = []
 
@@ -113,7 +113,12 @@ end
 
 # export GITLAB_HOST = ...
 # export GITLAB_TOKEN = ...
-Gitlab.endpoint = ENV['GITLAB_HOST']
-Gitlab.private_token = ENV['GITLAB_TOKEN']
+Gitlab.endpoint = ENV['GITLAB_HOST1']
+Gitlab.private_token = ENV['GITLAB_TOKEN1']
+
+if Gitlab.endpoint.nil? or Gitlab.endpoint.blank? or Gitlab.private_token.nil? or Gitlab.private_token.blank?
+  puts "ERROR: check your gitlab host and private_token settings!!!"
+  exit(1)
+end
 
 main
