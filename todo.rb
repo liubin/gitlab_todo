@@ -37,7 +37,7 @@ def close_issues(todos)
     issues.each do |issue|
       if issue.title == todo and issue.labels.include?('todo') and issue.state == 'opened'
         puts "close todo [#{issue.id}: #{todo}]"
-        Gitlab.issues.close_issue(project.id, issue.id)
+        Gitlab.close_issue(project.id, issue.id)
       end
     end
   end
