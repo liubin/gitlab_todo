@@ -3,9 +3,10 @@
 
 require 'gitlab'
 
+# [TODO: check if gitlab host or token if set]
+# [TODO: add file name to issue body? ]
 $new_todo = []
 $old_todo = []
-
 
 def pt(todo,sign)
 
@@ -44,7 +45,6 @@ def close_issues(todos)
 
 end
 
-# [TODO: add file name to issue body? ]
 # main
 def main
 
