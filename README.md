@@ -1,4 +1,4 @@
-# a git hook to pick todo in comment and post as an issue to gitlab
+# a git hook to pickup todo from comment of your code and post as an issue to gitlab
 
 now support .rb/.php/.java
 
