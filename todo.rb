@@ -1,44 +1,110 @@
 #!/usr/bin/env ruby
 #encoding: utf-8
 
-ci = `git diff HEAD^ HEAD`
+require 'gitlab'
 
-out = ci
+$new_todo = []
+$old_todo = []
 
-puts ci
-
-new_todo = []
-old_todo = []
-
-ext = 'rb'
 
 def pt(todo,sign)
-  puts "#{sign} : #{todo}"
-end
-# main
-ci.split('\n').each do |line|
-  file_ext = /diff --git a\/(\w*\/){0,}(\w*)\.(\w*)/.match(line)
 
-  diff_line = /^[-|+]\s*/.match(line)
-
-  if file_ext.nil? and not diff_line.nil?
-    case ext
-    when 'rb'
-      # ruby source
-      if line.gsub(/^[-|+]\s*/, "")[0] == '#'
-        tm = /#\s*(\[TODO:)(.*)(\])/.match(line)
-
-        todo = tm[2] if not tm.nil?
-        todo.gsub!(/^\s*/,"").gsub!(/\s*$/,"")
-        pt todo, line[0]
-      end
-    when 'php','java'
-      # comment use // or /** */
-    end
-  elsif not file_ext.nil? and file_ext.size == 4
-    ext = file_ext[3].downcase
+  if sign == '-'
+    $old_todo << todo
+  elsif sign == '+'
+    $new_todo << todo
   end
 
-
-  todo = nil
+  add_issues($new_todo - $old_todo)
+  close_issues($old_todo - $new_todo)
 end
+
+def add_issues(todos)
+
+  project = get_current_project
+  my_user_id = get_current_user_id
+  todos.each do |todo|
+    puts "add todo #{todo}"
+    Gitlab.issues.create_issue(project.id, todo, {:labels => 'todo', :assignee_id => my_user_id })
+  end
+
+end
+
+def close_issues(todos)
+
+  project = get_current_project
+  issues = Gitlab.issues(project.id)
+
+  todos.each do |todo|
+    issues.each do |issue|
+      if issue.title == todo and issue.labels.include?('todo') and issue.state == 'opened'
+        puts "close todo #{issue.id}: #{todo}"
+        Gitlab.issues.close_issue(project.id, issue.id)
+      end
+    end
+  end
+
+end
+
+
+# main
+def main
+
+  ci = `git diff HEAD^ HEAD`
+
+  ext = 'rb'
+
+  ci.split("\n").each do |line|
+
+    file_ext = /diff --git a\/(\w*\/){0,}(\w*)\.(\w*)/.match(line)
+
+    diff_line = /^[-|+]\s*/.match(line)
+
+    if file_ext.nil? and not diff_line.nil?
+      case ext
+      when 'rb'
+        # ruby source
+        if line.gsub(/^[-|+]\s*/, "")[0] == '#'
+          tm = /#\s*(\[TODO:)(.*)(\])/.match(line)
+          unless tm.nil?
+            todo = tm[2]
+            todo.gsub!(/^\s*/,"").gsub!(/\s*$/,"")
+            pt todo, line[0]
+          end
+        end
+      when 'php','java'
+        # comment use // or /** */
+        # [TODO: add java and php support]
+      end
+    elsif not file_ext.nil? and file_ext.size == 4
+      ext = file_ext[3].downcase
+    end
+  end
+end
+
+def get_current_project
+  # list projects
+  projects = Gitlab.projects()
+  local = `git remote -v`
+  local.split("\n").each do |line|
+    projects.each do |project|
+      if line.index(project.ssh_url_to_repo)
+        return project
+      end
+    end
+  end
+  nil
+end
+
+def get_current_user_id
+  # list projects
+  user = Gitlab.user()
+  user.id
+end
+
+# export GITLAB_HOST = ...
+# export GITLAB_TOKEN = ...
+Gitlab.endpoint = ENV['GITLAB_HOST']
+Gitlab.private_token = ENV['GITLAB_TOKEN']
+
+main
