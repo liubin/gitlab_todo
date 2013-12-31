@@ -26,8 +26,8 @@ public class BatchJobRunner {
     boolean f = true;
 
     threadsPool.shutdown();
-    // [TODO: add for java 哈哈]
-    /** [TODO: comment2] */
+    // [TODO: add for java222 哈哈]
+    /** [TODO: comment2222 ] */
     try {
       while (!threadsPool.awaitTermination(60, TimeUnit.SECONDS)) {
         System.out.println("wait for thread pool to shutdown");
