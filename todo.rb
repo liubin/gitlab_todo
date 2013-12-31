@@ -3,5 +3,12 @@
 
 ci = `git diff HEAD^ HEAD`
 
-puts ci
+out = ci
 # [TODO: todo2]
+
+new_todo = []
+old_todo = []
+
+ci.split('\n').each do |line|
+
+end
