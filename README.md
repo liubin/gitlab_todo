@@ -4,16 +4,16 @@ now support .rb/.php/.java
 
 ## setup
 
-** 1. copy `todo.rb` to your PATH or somewhere not in your PATH **
+**1. copy `todo.rb` to your PATH or somewhere not in your PATH**
 
-** 2. add a `post-commit` file to your hooks directory. **
+**2. add a `post-commit` file to your hooks directory.**
 
   $ cat .git/hooks/post-commit
   exec todo.rb
 
-** 3. set gitlab url and private token **
+**3. set gitlab url and private token**
 
-  export GITLAB_HOST = ...
+  export GITLAB_HOST = ...  
   export GITLAB_TOKEN = ...
 
 ## how to use
@@ -36,7 +36,7 @@ or
 # [TODO: zzzzz ]
 ```
 
-and this will add an issue {:title => xxxx, :description => file_name, :assignee_id => your_user_id} to your gitlab repos.
+and this will add an issue {:title => xxxx, :description => file_name, :assignee_id => your_user_id, labels => 'todo' } to your gitlab repos.
 
 
 ## feedback
