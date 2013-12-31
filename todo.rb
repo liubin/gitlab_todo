@@ -23,7 +23,7 @@ def add_issues(todos)
   my_user_id = get_current_user_id
   todos.each do |todo|
     puts "add todo [#{todo}]"
-    #Gitlab.create_issue(project.id, todo, {:labels => 'todo', :assignee_id => my_user_id })
+    Gitlab.create_issue(project.id, todo, {:labels => 'todo', :assignee_id => my_user_id })
   end
 
 end
@@ -44,7 +44,7 @@ def close_issues(todos)
 
 end
 
-
+# [TODO: add file name to issue body? ]
 # main
 def main
 
