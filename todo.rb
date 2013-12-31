@@ -4,16 +4,15 @@
 require 'gitlab'
 
 # [TODO: check if gitlab host or token if set]
-# [TODO: add file name to issue body? ]
 $new_todo = []
 $old_todo = []
 
-def pt(todo,sign)
+def pt(todo, sign, file_name)
 
   if sign == '-'
-    $old_todo << todo
+    $old_todo << { :todo => todo, :file_name => file_name }
   elsif sign == '+'
-    $new_todo << todo
+    $new_todo << { :todo => todo, :file_name => file_name }
   end
 
 end
@@ -24,7 +23,8 @@ def add_issues(todos)
   my_user_id = get_current_user_id
   todos.each do |todo|
     puts "add todo [#{todo}]"
-    Gitlab.create_issue(project.id, todo, {:labels => 'todo', :assignee_id => my_user_id })
+    Gitlab.create_issue(project.id, todo[:todo], {:labels => 'todo', :assignee_id => my_user_id,
+        :description => todo[:file_name] })
   end
 
 end
@@ -36,7 +36,7 @@ def close_issues(todos)
 
   todos.each do |todo|
     issues.each do |issue|
-      if issue.title == todo and issue.labels.include?('todo') and issue.state == 'opened'
+      if issue.title == todo[:todo] and issue.labels.include?('todo') and issue.state == 'opened'
         puts "close todo [#{issue.id}: #{todo}]"
         Gitlab.close_issue(project.id, issue.id)
       end
@@ -51,11 +51,11 @@ def main
   ci = `git diff HEAD^ HEAD`
 
   ext = 'rb'
+  file_name = nil
 
   ci.split("\n").each do |line|
 
     file_ext = /diff --git a\/(\w*\/){0,}(\w*)\.(\w*)/.match(line)
-
     diff_line = /^[-|+]\s*/.match(line)
 
     if file_ext.nil? and not diff_line.nil?
@@ -67,7 +67,7 @@ def main
           unless tm.nil?
             todo = tm[2]
             todo.gsub!(/^\s*/,"").gsub!(/\s*$/,"")
-            pt todo, line[0]
+            pt todo, line[0], file_name
           end
         end
       when 'php','java'
@@ -78,13 +78,14 @@ def main
           unless tm.nil?
             todo = tm[2]
             todo.gsub!(/^\s*/,"").gsub!(/\s*$/,"")
-            pt todo, line[0]
+            pt todo, line[0], file_name
           end
         end
       end
     elsif not file_ext.nil? and file_ext.size == 4
       ext = file_ext[3].downcase
-      puts "file ext is #{ext}"
+      file_name = file_ext[0].gsub(/diff --git a\//,"")
+      #puts "file ext is #{ext}"
     end
   end
 
