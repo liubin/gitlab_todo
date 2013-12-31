@@ -8,7 +8,7 @@ now support .rb/.php/.java
 
 **2. add a `post-commit` file to your hooks directory.**
 
-  $ cat .git/hooks/post-commit
+  $ cat .git/hooks/post-commit  
   exec todo.rb
 
 **3. set gitlab url and private token**
