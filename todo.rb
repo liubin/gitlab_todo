@@ -36,9 +36,13 @@ def close_issues(todos)
 
   todos.each do |todo|
     issues.each do |issue|
-      if issue.title == todo[:todo] and issue.labels.include?('todo') and issue.state == 'opened'
-        puts "close todo [#{issue.id}: #{todo}]"
-        Gitlab.close_issue(project.id, issue.id)
+      if issue.title == todo[:todo]
+        if issue.labels.include?('todo') and issue.state == 'opened'
+          puts "close todo [#{issue.id}: #{todo}]"
+          Gitlab.close_issue(project.id, issue.id)
+        else
+          puts "not closed issue: #{issue.id} #{issue.title} #{issue.description} #{issue.labels} #{issue.state}"
+        end
       end
     end
   end
@@ -113,10 +117,10 @@ end
 
 # export GITLAB_HOST = ...
 # export GITLAB_TOKEN = ...
-Gitlab.endpoint = ENV['GITLAB_HOST1']
-Gitlab.private_token = ENV['GITLAB_TOKEN1']
+Gitlab.endpoint = ENV['GITLAB_HOST']
+Gitlab.private_token = ENV['GITLAB_TOKEN']
 
-if Gitlab.endpoint.nil? or Gitlab.endpoint.blank? or Gitlab.private_token.nil? or Gitlab.private_token.blank?
+if Gitlab.endpoint.nil? or Gitlab.private_token.nil?
   puts "ERROR: check your gitlab host and private_token settings!!!"
   exit(1)
 end
