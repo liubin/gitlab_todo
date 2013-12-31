@@ -24,8 +24,8 @@ def add_issues(todos)
   project = get_current_project
   my_user_id = get_current_user_id
   todos.each do |todo|
-    puts "add todo #{todo}"
-    Gitlab.issues.create_issue(project.id, todo, {:labels => 'todo', :assignee_id => my_user_id })
+    puts "add todo [#{todo}]"
+    Gitlab.create_issue(project.id, todo, {:labels => 'todo', :assignee_id => my_user_id })
   end
 
 end
@@ -38,7 +38,7 @@ def close_issues(todos)
   todos.each do |todo|
     issues.each do |issue|
       if issue.title == todo and issue.labels.include?('todo') and issue.state == 'opened'
-        puts "close todo #{issue.id}: #{todo}"
+        puts "close todo [#{issue.id}: #{todo}]"
         Gitlab.issues.close_issue(project.id, issue.id)
       end
     end
@@ -88,16 +88,13 @@ def get_current_project
   local = `git remote -v`
   local.split("\n").each do |line|
     projects.each do |project|
-      if line.index(project.ssh_url_to_repo)
-        return project
-      end
+      return project if line.index(project.ssh_url_to_repo)
     end
   end
   nil
 end
 
 def get_current_user_id
-  # list projects
   user = Gitlab.user()
   user.id
 end
