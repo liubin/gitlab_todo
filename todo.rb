@@ -15,8 +15,6 @@ def pt(todo,sign)
     $new_todo << todo
   end
 
-  add_issues($new_todo - $old_todo)
-  close_issues($old_todo - $new_todo)
 end
 
 def add_issues(todos)
@@ -25,7 +23,7 @@ def add_issues(todos)
   my_user_id = get_current_user_id
   todos.each do |todo|
     puts "add todo [#{todo}]"
-    Gitlab.create_issue(project.id, todo, {:labels => 'todo', :assignee_id => my_user_id })
+    #Gitlab.create_issue(project.id, todo, {:labels => 'todo', :assignee_id => my_user_id })
   end
 
 end
@@ -74,12 +72,25 @@ def main
         end
       when 'php','java'
         # comment use // or /** */
-        # [TODO: add java and php support]
+        if not /\/\/*/.match(line.gsub(/^[-|+]\s*/, "")).nil? or not /\/\**/.match(line.gsub(/^[-|+]\s*/, "")).nil?
+
+          tm = /\s*(\[TODO:)(.*)(\])/.match(line)
+          unless tm.nil?
+            todo = tm[2]
+            todo.gsub!(/^\s*/,"").gsub!(/\s*$/,"")
+            pt todo, line[0]
+          end
+        end
       end
     elsif not file_ext.nil? and file_ext.size == 4
       ext = file_ext[3].downcase
+      puts "file ext is #{ext}"
     end
   end
+
+  # create or close issus
+  add_issues($new_todo - $old_todo)
+  close_issues($old_todo - $new_todo)
 end
 
 def get_current_project
