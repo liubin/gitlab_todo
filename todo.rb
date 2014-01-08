@@ -17,12 +17,26 @@ def pt(todo, sign, file_name)
 
 end
 
-def add_issues(todos)
+BOLD      = "\e[01m"
+RESET     = "\e[00m"
+YELLOW  = "\e[38;5;3m"
+GREEN = "\e[38;5;2m"
+RED   = "\e[38;5;1m"
 
+def print_header(title)
+  line = "++++++++++++++++++++++++++++++\n"
+  STDOUT.write( BOLD + YELLOW + line + RESET )
+  STDOUT.write( BOLD + YELLOW + title + "\n"+ RESET )
+  STDOUT.write( BOLD + YELLOW + line + "\n" + RESET )
+end
+
+def add_issues(todos)
   project = get_current_project
+  #puts project.to_json
   my_user_id = get_current_user_id
+  print_header('New Todos')
   todos.each do |todo|
-    puts "add todo [#{todo}]"
+    STDOUT.write( GREEN + "add todo [#{todo}]" + "\n" + RESET)
     Gitlab.create_issue(project.id, todo[:todo], {:labels => 'todo', :assignee_id => my_user_id,
         :description => todo[:file_name] })
   end
@@ -33,15 +47,16 @@ def close_issues(todos)
 
   project = get_current_project
   issues = Gitlab.issues(project.id)
+  print_header('Closed Todos')
 
   todos.each do |todo|
     issues.each do |issue|
       if issue.title == todo[:todo]
         if issue.labels.include?('todo') and issue.state == 'opened'
-          puts "close todo [#{issue.id}: #{todo}]"
+          STDOUT.write( RED + "close todo [#{issue.id}: #{todo}]" + "\n" + RESET)
           Gitlab.close_issue(project.id, issue.id)
         else
-          puts "not closed issue: #{issue.id} #{issue.title} #{issue.description} #{issue.labels} #{issue.state}"
+          # puts "not closed issue: #{issue.id} #{issue.title} #{issue.description} #{issue.labels} #{issue.state}"
         end
       end
     end
@@ -122,7 +137,7 @@ Gitlab.private_token = ENV['GITLAB_TOKEN']
 
 if Gitlab.endpoint.nil? or Gitlab.private_token.nil?
   puts "ERROR: check your gitlab host and private_token settings!!!"
-  exit(1)
+else
+  main
 end
 
-main
