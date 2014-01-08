@@ -89,7 +89,7 @@ def main
             pt todo, line[0], file_name
           end
         end
-      when 'php','java'
+      when 'php','java', 'js', 'c', 'cpp'
         # comment use // or /** */
         if not /\/\/*/.match(line.gsub(/^[-|+]\s*/, "")).nil? or not /\/\**/.match(line.gsub(/^[-|+]\s*/, "")).nil?
 
