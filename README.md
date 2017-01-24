@@ -3,7 +3,7 @@
 now support .rb/.php/.java
 
 ## setup
-**1. install gitlab package
+**1. install gitlab package**
 
 ``
 sudo gem install gitlab
