@@ -3,6 +3,7 @@
 
 require 'gitlab'
 
+Encoding.default_external = Encoding::UTF_8
 
 $new_todo = []
 $old_todo = []
