@@ -3,17 +3,22 @@
 now support .rb/.php/.java
 
 ## setup
+**1. install gitlab package
 
-**1. copy `todo.rb` to your PATH or somewhere not in your PATH**
+``
+sudo gem install gitlab
+``
 
-**2. add a `post-commit` file to your hooks directory.**
+**2. copy `todo.rb` to your PATH or somewhere not in your PATH**
+
+**3. add a `post-commit` file to your hooks directory.**
 
   $ cat .git/hooks/post-commit  
   todo.rb
 
   please verify your post-commit has a execute permission(through `chmod+x`).
 
-**3. set gitlab url and private token**
+**4. set gitlab url and private token**
 
   export GITLAB_HOST = ...  
   export GITLAB_TOKEN = ...
